@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>empty.db</file>
+        <file>128279.png</file>
+    </qresource>
+</RCC>
