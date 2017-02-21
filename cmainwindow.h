@@ -46,6 +46,8 @@ private slots:
 	void				picturesMessage(const QString& szMessage, const qint32 &iProgress);
 	void				picturesAppendMessage(const QString& szMessage);
 	void				picturesDone();
+	void				on_m_lpSeriesList_pressed(const QModelIndex &index);
+
 private:
 	Ui::cMainWindow*	ui;
 	cSerieList			m_serieList;

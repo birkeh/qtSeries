@@ -249,12 +249,12 @@ void cMainWindow::displaySeries()
 	QIcon	icon(":/128279.png");
 	QTreeWidgetItem*	lpSelected	= 0;
 
-	for(int z = 0;z < m_serieList.count();z++)
+	for(int serie = 0;serie < m_serieList.count();serie++)
 	{
-		cSerie*	lpSerie	= m_serieList.at(z);
+		cSerie*	lpSerie	= m_serieList.at(serie);
 
 		QTreeWidgetItem*	lp0	= new QTreeWidgetItem(ui->m_lpSeriesList);
-		lp0->setText(0, QString("%1").arg(z+1));
+		lp0->setText(0, QString("%1").arg(serie+1));
 		lp0->setTextAlignment(0, Qt::AlignRight);
 		lp0->setData(0, Qt::UserRole, QVariant::fromValue(lpSerie));
 
@@ -266,14 +266,16 @@ void cMainWindow::displaySeries()
 		bool		bHasProg	= false;
 		bool		bHasDone	= false;
 
+		QString		szOpen;
+
 		QList<cSeason*>	seasonList	= lpSerie->seasonList();
-		for(int z = 0;z < seasonList.count();z++)
+		for(int season = 0;season < seasonList.count();season++)
 		{
 			QString		szInit		= "";
 			QString		szProg		= "";
 			QString		szDone		= "";
 
-			cSeason*	lpSeason	= seasonList.at(z);
+			cSeason*	lpSeason	= seasonList.at(season);
 			lp0->setData(lpSeason->number()+3-iMin, Qt::UserRole, QVariant::fromValue(lpSeason));
 
 			for(int y = 0;y < lpSeason->episodeList().count();y++)
@@ -316,6 +318,17 @@ void cMainWindow::displaySeries()
 				szTooltip.append("open: none\n");
 			else
 				szTooltip.append("open: " + szInit + "\n");
+
+			if(lpSeason->number())
+			{
+				if(szOpen.length())
+					szOpen	+= "\n";
+
+				if(szInit.isEmpty())
+					szOpen	+= QString("Season %1: none").arg(lpSeason->number(), 2, 10, QChar('0'));
+				else
+					szOpen	+= QString("Season %1: %2").arg(lpSeason->number(), 2, 10, QChar('0')).arg(szInit);
+			}
 
 			if(szProg.isEmpty())
 				szTooltip.append("in progress: none\n");
@@ -384,7 +397,12 @@ void cMainWindow::displaySeries()
 				lpSelected	= lp0;
 			}
 		}
+
+		lp0->setToolTip(0, szOpen);
+		lp0->setToolTip(1, szOpen);
+		lp0->setToolTip(2, szOpen);
 	}
+
 	for(int z = 0;z < ui->m_lpSeriesList->columnCount();z++)
 		ui->m_lpSeriesList->resizeColumnToContents(z);
 
@@ -787,4 +805,24 @@ void cMainWindow::picturesDone()
 	if(m_lpMessageDialog)
 		delete m_lpMessageDialog;
 	m_lpMessageDialog	= 0;
+}
+
+void cMainWindow::on_m_lpSeriesList_pressed(const QModelIndex &index)
+{
+	switch(QGuiApplication::mouseButtons())
+	{
+	case Qt::MiddleButton:
+		if(ui->m_lpSeriesList->selectedItems().count() == 1)
+		{
+			cSerie*	lpSerie	= ui->m_lpSeriesList->selectedItems().at(0)->data(0, Qt::UserRole).value<cSerie*>();
+			if(lpSerie)
+			{
+				if(!lpSerie->download().isEmpty())
+					onActionGotoDownload();
+			}
+		}
+		break;
+	default:
+		break;
+	}
 }
