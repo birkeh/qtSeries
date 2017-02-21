@@ -262,12 +262,17 @@ void cMainWindow::displaySeries()
 		lp0->setText(2, lpSerie->firstAired().toString("yyyy"));
 		lp0->setTextAlignment(2, Qt::AlignRight);
 
+		bool		bHasInit	= false;
+		bool		bHasProg	= false;
+		bool		bHasDone	= false;
+
 		QList<cSeason*>	seasonList	= lpSerie->seasonList();
 		for(int z = 0;z < seasonList.count();z++)
 		{
 			QString		szInit		= "";
 			QString		szProg		= "";
 			QString		szDone		= "";
+
 			cSeason*	lpSeason	= seasonList.at(z);
 			lp0->setData(lpSeason->number()+3-iMin, Qt::UserRole, QVariant::fromValue(lpSeason));
 
@@ -279,6 +284,9 @@ void cMainWindow::displaySeries()
 						szInit.append(QString("%1").arg(lpSeason->episodeList().at(y)->episodeNumber()));
 					else
 						szInit.append(QString(", %1").arg(lpSeason->episodeList().at(y)->episodeNumber()));
+
+					if(lpSeason->number())
+						bHasInit	= true;
 				}
 				else if(lpSeason->episodeList().at(y)->state() == cEpisode::StateProgress)
 				{
@@ -286,6 +294,9 @@ void cMainWindow::displaySeries()
 						szProg.append(QString("%1").arg(lpSeason->episodeList().at(y)->episodeNumber()));
 					else
 						szProg.append(QString(", %1").arg(lpSeason->episodeList().at(y)->episodeNumber()));
+
+					if(lpSeason->number())
+						bHasProg	= true;
 				}
 				else if(lpSeason->episodeList().at(y)->state() == cEpisode::StateDone)
 				{
@@ -293,6 +304,9 @@ void cMainWindow::displaySeries()
 						szDone.append(QString("%1").arg(lpSeason->episodeList().at(y)->episodeNumber()));
 					else
 						szDone.append(QString(", %1").arg(lpSeason->episodeList().at(y)->episodeNumber()));
+
+					if(lpSeason->number())
+						bHasDone	= true;
 				}
 			}
 
@@ -334,6 +348,28 @@ void cMainWindow::displaySeries()
 			lp0->setForeground(0, QBrush(Qt::red));
 			lp0->setForeground(1, QBrush(Qt::red));
 			lp0->setForeground(2, QBrush(Qt::red));
+		}
+
+		if(bHasProg)
+		{
+			lp0->setForeground(0, QBrush(Qt::white));
+			lp0->setForeground(1, QBrush(Qt::white));
+			lp0->setForeground(2, QBrush(Qt::white));
+			lp0->setBackground(0, QBrush(Qt::blue));
+			lp0->setBackground(1, QBrush(Qt::blue));
+			lp0->setBackground(2, QBrush(Qt::blue));
+		}
+		else if(bHasInit)
+		{
+			lp0->setBackground(0, QBrush(Qt::lightGray));
+			lp0->setBackground(1, QBrush(Qt::lightGray));
+			lp0->setBackground(2, QBrush(Qt::lightGray));
+		}
+		else
+		{
+			lp0->setBackground(0, QBrush(Qt::green));
+			lp0->setBackground(1, QBrush(Qt::green));
+			lp0->setBackground(2, QBrush(Qt::green));
 		}
 
 		if(lpSerie->download().length())
