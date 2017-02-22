@@ -26,9 +26,9 @@ void cUpdateThread::run()
 	QTime	timer;
 	timer.restart();
 
-	for(int x = 0;x < m_items.count();x++)
+	for(int x = 0;x < m_indexList.count();x++)
 	{
-		cSerie*	lpSerie	= m_items.at(x)->data(0, Qt::UserRole).value<cSerie*>();
+		cSerie*	lpSerie	= m_indexList.at(x).data(Qt::UserRole).value<cSerie*>();
 		if(lpSerie)
 		{
 			emit updateMessage(lpSerie->seriesName(), x);
@@ -63,9 +63,9 @@ void cUpdateThread::run()
 	}
 }
 
-void cUpdateThread::setData(cMessageDialog* lpMessageDialog, const QList<QTreeWidgetItem*>& items, const QSqlDatabase& db)
+void cUpdateThread::setData(cMessageDialog* lpMessageDialog, const QModelIndexList &indexList, const QSqlDatabase& db)
 {
 	connect(lpMessageDialog->cancelButton(), SIGNAL(clicked()), this, SLOT(stop()));
-	m_items		= items;
+	m_indexList	= indexList;
 	m_db		= db;
 }

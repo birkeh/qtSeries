@@ -46,12 +46,15 @@ cMainWindow::cMainWindow(QWidget *parent) :
 
 	ui->setupUi(this);
 
+	m_lpSeriesListModel	= new QStandardItemModel(0, 3);
 	initDB();
 
+	ui->m_lpSeriesList->setModel(m_lpSeriesListModel);
 	ui->m_lpSeriesList->setItemDelegate(new cSeasonDelegate(ui->m_lpSeriesList));
 
-	ui->m_lpSeriesList->setHeaderLabels(QStringList() << "Nr" << "Serie" << "Year");
-	ui->m_lpSeriesList->setColumnCount(3);
+	QStringList	header;
+	header << "Nr" << "Serie" << "Year";
+	m_lpSeriesListModel->setHorizontalHeaderLabels(header);
 
 	loadDB();
 	displaySeries();
@@ -228,17 +231,20 @@ void cMainWindow::loadDB()
 
 void cMainWindow::displaySeries()
 {
-	ui->m_lpSeriesList->clear();
+	m_lpSeriesListModel->clear();
 
 	qint16	iMin	= m_serieList.minSeason();
 	qint16	iMax	= m_serieList.maxSeason();
 
-	ui->m_lpSeriesList->setColumnCount(iMax-iMin+2);
+	m_lpSeriesListModel->setColumnCount(iMax-iMin+2);
 
-	QTreeWidgetItem*	lpHeader	= ui->m_lpSeriesList->headerItem();
-	for(int z = iMin, x = 1;z < iMax;z++, x++)
-		lpHeader->setText(x+2, QString("Season %1").arg(z));
-	lpHeader->setData(0, Qt::UserRole, QVariant(iMin));
+	QStringList	header;
+	header << "Nr" << "Serie" << "Year";
+
+	for(int z = 0;z <= iMax;z++)
+		header.append(QString("Season %1").arg(z));
+	m_lpSeriesListModel->setHorizontalHeaderLabels(header);
+	m_lpSeriesListModel->setHeaderData(0, Qt::Horizontal, QVariant(iMin), Qt::UserRole);
 
 	QFont	font	= ui->m_lpSeriesList->font();
 	QFont	fontI	= ui->m_lpSeriesList->font();
@@ -246,21 +252,25 @@ void cMainWindow::displaySeries()
 	font.setBold(true);
 	fontI.setItalic(true);
 
-	QIcon	icon(":/128279.png");
-	QTreeWidgetItem*	lpSelected	= 0;
+	QIcon		icon(":/128279.png");
+	QModelIndex	selected;
 
 	for(int serie = 0;serie < m_serieList.count();serie++)
 	{
+		QList<QStandardItem*>	lpItems;
+
+		for(int z = 0;z < header.count();z++)
+			lpItems.append(new QStandardItem);
+
 		cSerie*	lpSerie	= m_serieList.at(serie);
 
-		QTreeWidgetItem*	lp0	= new QTreeWidgetItem(ui->m_lpSeriesList);
-		lp0->setText(0, QString("%1").arg(serie+1));
-		lp0->setTextAlignment(0, Qt::AlignRight);
-		lp0->setData(0, Qt::UserRole, QVariant::fromValue(lpSerie));
+		lpItems.at(0)->setText(QString("%1").arg(serie+1));
+		lpItems.at(0)->setTextAlignment(Qt::AlignRight);
+		lpItems.at(0)->setData(QVariant::fromValue(lpSerie), Qt::UserRole);
 
-		lp0->setText(1, lpSerie->seriesName());
-		lp0->setText(2, lpSerie->firstAired().toString("yyyy"));
-		lp0->setTextAlignment(2, Qt::AlignRight);
+		lpItems.at(1)->setText(lpSerie->seriesName());
+		lpItems.at(2)->setText(lpSerie->firstAired().toString("yyyy"));
+		lpItems.at(2)->setTextAlignment(Qt::AlignRight);
 
 		bool		bHasInit	= false;
 		bool		bHasProg	= false;
@@ -276,7 +286,7 @@ void cMainWindow::displaySeries()
 			QString		szDone		= "";
 
 			cSeason*	lpSeason	= seasonList.at(season);
-			lp0->setData(lpSeason->number()+3-iMin, Qt::UserRole, QVariant::fromValue(lpSeason));
+			lpItems.at(lpSeason->number()+3-iMin)->setData(QVariant::fromValue(lpSeason), Qt::UserRole);
 
 			for(int y = 0;y < lpSeason->episodeList().count();y++)
 			{
@@ -341,73 +351,73 @@ void cMainWindow::displaySeries()
 				szTooltip.append("done: " + szDone);
 
 			if(szTooltip.isEmpty())
-				lp0->setToolTip(lpSeason->number()+3-iMin, szTooltip);
+				lpItems.at(lpSeason->number()+3-iMin)->setToolTip(szTooltip);
 			else
-				lp0->setToolTip(lpSeason->number()+3-iMin, szTooltip);
+				lpItems.at(lpSeason->number()+3-iMin)->setToolTip(szTooltip);
 		}
 
 		if(lpSerie->status().compare("Ended", Qt::CaseInsensitive))
 		{
-			lp0->setFont(0, font);
-			lp0->setFont(1, font);
-			lp0->setFont(2, font);
+			lpItems.at(0)->setFont(font);
+			lpItems.at(1)->setFont(font);
+			lpItems.at(2)->setFont(font);
 		}
 
 		if(lpSerie->cliffhanger())
 		{
-			lp0->setFont(0, fontI);
-			lp0->setFont(1, fontI);
-			lp0->setFont(2, fontI);
-			lp0->setForeground(0, QBrush(Qt::red));
-			lp0->setForeground(1, QBrush(Qt::red));
-			lp0->setForeground(2, QBrush(Qt::red));
+			lpItems.at(0)->setFont(fontI);
+			lpItems.at(1)->setFont(fontI);
+			lpItems.at(2)->setFont(fontI);
+			lpItems.at(0)->setForeground(QBrush(Qt::red));
+			lpItems.at(1)->setForeground(QBrush(Qt::red));
+			lpItems.at(2)->setForeground(QBrush(Qt::red));
 		}
 
 		if(bHasProg)
 		{
-			lp0->setForeground(0, QBrush(Qt::white));
-			lp0->setForeground(1, QBrush(Qt::white));
-			lp0->setForeground(2, QBrush(Qt::white));
-			lp0->setBackground(0, QBrush(Qt::blue));
-			lp0->setBackground(1, QBrush(Qt::blue));
-			lp0->setBackground(2, QBrush(Qt::blue));
+			lpItems.at(0)->setForeground(QBrush(Qt::white));
+			lpItems.at(1)->setForeground(QBrush(Qt::white));
+			lpItems.at(2)->setForeground(QBrush(Qt::white));
+			lpItems.at(0)->setBackground(QBrush(Qt::blue));
+			lpItems.at(1)->setBackground(QBrush(Qt::blue));
+			lpItems.at(2)->setBackground(QBrush(Qt::blue));
 		}
 		else if(bHasInit)
 		{
-			lp0->setBackground(0, QBrush(Qt::lightGray));
-			lp0->setBackground(1, QBrush(Qt::lightGray));
-			lp0->setBackground(2, QBrush(Qt::lightGray));
+			lpItems.at(0)->setBackground(QBrush(Qt::lightGray));
+			lpItems.at(1)->setBackground(QBrush(Qt::lightGray));
+			lpItems.at(2)->setBackground(QBrush(Qt::lightGray));
 		}
 		else
 		{
-			lp0->setBackground(0, QBrush(Qt::green));
-			lp0->setBackground(1, QBrush(Qt::green));
-			lp0->setBackground(2, QBrush(Qt::green));
+			lpItems.at(0)->setBackground(QBrush(Qt::green));
+			lpItems.at(1)->setBackground(QBrush(Qt::green));
+			lpItems.at(2)->setBackground(QBrush(Qt::green));
 		}
 
 		if(lpSerie->download().length())
-			lp0->setIcon(0, icon);
-		ui->m_lpSeriesList->insertTopLevelItem(0, lp0);
+			lpItems.at(0)->setIcon(icon);
+		m_lpSeriesListModel->appendRow(lpItems);
 
 		if(!m_szOldSelected.isEmpty())
 		{
 			if(!m_szOldSelected.compare(lpSerie->seriesName()))
 			{
-				lp0->setSelected(true);
-				lpSelected	= lp0;
+				selected	= m_lpSeriesListModel->indexFromItem(lpItems.at(0));
+				ui->m_lpSeriesList->selectionModel()->select(selected, QItemSelectionModel::Select | QItemSelectionModel::Rows);
 			}
 		}
 
-		lp0->setToolTip(0, szOpen);
-		lp0->setToolTip(1, szOpen);
-		lp0->setToolTip(2, szOpen);
+		lpItems.at(0)->setToolTip(szOpen);
+		lpItems.at(1)->setToolTip(szOpen);
+		lpItems.at(2)->setToolTip(szOpen);
 	}
 
-	for(int z = 0;z < ui->m_lpSeriesList->columnCount();z++)
+	for(int z = 0;z < m_lpSeriesListModel->columnCount();z++)
 		ui->m_lpSeriesList->resizeColumnToContents(z);
 
-	if(lpSelected)
-		ui->m_lpSeriesList->scrollToItem(lpSelected);
+	if(selected.isValid())
+		ui->m_lpSeriesList->scrollTo(selected, QAbstractItemView::PositionAtCenter);
 
 	m_szOldSelected	= "";
 }
@@ -417,17 +427,20 @@ void cMainWindow::on_m_lpSeriesList_customContextMenuRequested(const QPoint &pos
 	QMenu*	lpMenu	= new QMenu(this);
 
 	lpMenu->addAction("add", this, SLOT(onActionAdd()));
-	if(ui->m_lpSeriesList->selectedItems().count() == 1)
+
+	if(ui->m_lpSeriesList->selectionModel()->selectedRows().count() == 1)
 	{
-		cSerie*	lpSerie	= ui->m_lpSeriesList->selectedItems().at(0)->data(0, Qt::UserRole).value<cSerie*>();
+		cSerie*	lpSerie	= m_lpSeriesListModel->itemFromIndex(ui->m_lpSeriesList->selectionModel()->selectedRows().at(0))->data(Qt::UserRole).value<cSerie*>();
 		if(lpSerie)
 		{
 			lpMenu->addAction("update", this, SLOT(onActionUpdate()));
 			lpMenu->addAction("delete", this, SLOT(onActionDelete()));
 			lpMenu->addAction("edit", this, SLOT(onActionEdit()));
 			lpMenu->addSeparator();
+
 			if(!lpSerie->imdbID().isEmpty())
 				lpMenu->addAction("open IMDB", this, SLOT(onActionGotoIMDB()));
+
 			if(!lpSerie->download().isEmpty())
 			{
 				lpMenu->addAction("open download link", this, SLOT(onActionGotoDownload()));
@@ -437,7 +450,7 @@ void cMainWindow::on_m_lpSeriesList_customContextMenuRequested(const QPoint &pos
 			lpMenu->addAction("load images", this, SLOT(onActionLoadPictures()));
 		}
 	}
-	else if(ui->m_lpSeriesList->selectedItems().count())
+	else if(ui->m_lpSeriesList->selectionModel()->selectedRows().count())
 	{
 		lpMenu->addAction("update", this, SLOT(onActionUpdate()));
 		lpMenu->addAction("delete", this, SLOT(onActionDelete()));
@@ -608,16 +621,19 @@ void cMainWindow::onActionAdd()
 
 void cMainWindow::onActionUpdate()
 {
-	if(ui->m_lpSeriesList->selectedItems().count())
+	if(ui->m_lpSeriesList->selectionModel()->selectedRows().count())
 	{
+		if(ui->m_lpSeriesList->selectionModel()->selectedRows().count() == 1)
+			m_szOldSelected	= m_lpSeriesListModel->itemFromIndex(ui->m_lpSeriesList->selectionModel()->selectedIndexes().at(1))->text();
+
 		m_lpMessageDialog	= new cMessageDialog(this);
 		m_lpMessageDialog->setWindowTitle("Update");
 		m_lpMessageDialog->setMessage("Updating");
-		m_lpMessageDialog->setProgress(0, ui->m_lpSeriesList->selectedItems().count());
+		m_lpMessageDialog->setProgress(0, ui->m_lpSeriesList->selectionModel()->selectedRows().count());
 		m_lpMessageDialog->show();
 
 		m_lpUpdateThread		= new cUpdateThread;
-		m_lpUpdateThread->setData(m_lpMessageDialog, ui->m_lpSeriesList->selectedItems(), m_db);
+		m_lpUpdateThread->setData(m_lpMessageDialog, ui->m_lpSeriesList->selectionModel()->selectedRows(), m_db);
 
 		connect(m_lpUpdateThread, SIGNAL(finished()), this, SLOT(updateDone()));
 		connect(m_lpUpdateThread, SIGNAL(updateMessage(QString,qint32)), this, SLOT(updateMessage(QString,qint32)));
@@ -657,7 +673,7 @@ void cMainWindow::onActionDelete()
 	if(QMessageBox::question(this, "Delete Serie", "Are you sure?") == QMessageBox::No)
 		return;
 
-	cSerie*	lpSerie	= ui->m_lpSeriesList->selectedItems().at(0)->data(0, Qt::UserRole).value<cSerie*>();
+	cSerie*	lpSerie	= m_lpSeriesListModel->itemFromIndex(ui->m_lpSeriesList->selectionModel()->selectedRows().at(0))->data(Qt::UserRole).value<cSerie*>();
 	if(!lpSerie)
 		return;
 
@@ -676,7 +692,7 @@ void cMainWindow::onActionDelete()
 
 void cMainWindow::onActionEdit()
 {
-	cSerie*	lpSerie	= ui->m_lpSeriesList->selectedItems().at(0)->data(0, Qt::UserRole).value<cSerie*>();
+	cSerie*	lpSerie	= m_lpSeriesListModel->itemFromIndex(ui->m_lpSeriesList->selectionModel()->selectedRows().at(0))->data(Qt::UserRole).value<cSerie*>();
 	if(!lpSerie)
 		return;
 
@@ -709,9 +725,9 @@ void cMainWindow::on_m_lpSeriesList_doubleClicked(const QModelIndex &/*index*/)
 
 void cMainWindow::onActionGotoIMDB()
 {
-	if(ui->m_lpSeriesList->selectedItems().count())
+	if(ui->m_lpSeriesList->selectionModel()->selectedRows().count())
 	{
-		cSerie*	lpSerie	= ui->m_lpSeriesList->selectedItems().at(0)->data(0, Qt::UserRole).value<cSerie*>();
+		cSerie*	lpSerie	= m_lpSeriesListModel->itemFromIndex(ui->m_lpSeriesList->selectionModel()->selectedRows().at(0))->data(Qt::UserRole).value<cSerie*>();
 		if(lpSerie)
 		{
 			QString	link	= QString("http://www.imdb.com/title/%1").arg(lpSerie->imdbID());
@@ -722,9 +738,9 @@ void cMainWindow::onActionGotoIMDB()
 
 void cMainWindow::onActionGotoDownload()
 {
-	if(ui->m_lpSeriesList->selectedItems().count())
+	if(ui->m_lpSeriesList->selectionModel()->selectedRows().count())
 	{
-		cSerie*	lpSerie	= ui->m_lpSeriesList->selectedItems().at(0)->data(0, Qt::UserRole).value<cSerie*>();
+		cSerie*	lpSerie	= m_lpSeriesListModel->itemFromIndex(ui->m_lpSeriesList->selectionModel()->selectedRows().at(0))->data(Qt::UserRole).value<cSerie*>();
 		if(lpSerie)
 		{
 			QString	link	= lpSerie->download();
@@ -735,9 +751,9 @@ void cMainWindow::onActionGotoDownload()
 
 void cMainWindow::onActionCopyDownload()
 {
-	if(ui->m_lpSeriesList->selectedItems().count())
+	if(ui->m_lpSeriesList->selectionModel()->selectedRows().count())
 	{
-		cSerie*	lpSerie	= ui->m_lpSeriesList->selectedItems().at(0)->data(0, Qt::UserRole).value<cSerie*>();
+		cSerie*	lpSerie	= m_lpSeriesListModel->itemFromIndex(ui->m_lpSeriesList->selectionModel()->selectedRows().at(0))->data(Qt::UserRole).value<cSerie*>();
 		if(lpSerie)
 		{
 			QString		link		= lpSerie->download();
@@ -751,10 +767,10 @@ void cMainWindow::onActionLoadPictures()
 {
 	QList<cSerie*>	serieList;
 
-	if(ui->m_lpSeriesList->selectedItems().count())
+	if(ui->m_lpSeriesList->selectionModel()->selectedRows().count())
 	{
-		for(int z = 0;z < ui->m_lpSeriesList->selectedItems().count();z++)
-			serieList.append(ui->m_lpSeriesList->selectedItems().at(z)->data(0, Qt::UserRole).value<cSerie*>());
+		for(int z = 0;z < ui->m_lpSeriesList->selectionModel()->selectedRows().count();z++)
+			serieList.append(m_lpSeriesListModel->itemFromIndex(ui->m_lpSeriesList->selectionModel()->selectedRows().at(z))->data(Qt::UserRole).value<cSerie*>());
 	}
 
 	if(!serieList.count())
@@ -812,9 +828,9 @@ void cMainWindow::on_m_lpSeriesList_pressed(const QModelIndex &index)
 	switch(QGuiApplication::mouseButtons())
 	{
 	case Qt::MiddleButton:
-		if(ui->m_lpSeriesList->selectedItems().count() == 1)
+		if(ui->m_lpSeriesList->selectionModel()->selectedRows().count() == 1)
 		{
-			cSerie*	lpSerie	= ui->m_lpSeriesList->selectedItems().at(0)->data(0, Qt::UserRole).value<cSerie*>();
+			cSerie*	lpSerie	= m_lpSeriesListModel->itemFromIndex(ui->m_lpSeriesList->selectionModel()->selectedRows().at(0))->data(Qt::UserRole).value<cSerie*>();
 			if(lpSerie)
 			{
 				if(!lpSerie->download().isEmpty())

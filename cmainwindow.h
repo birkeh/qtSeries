@@ -14,6 +14,8 @@
 
 #include <QTime>
 
+#include <QStandardItemModel>
+
 
 namespace Ui {
 class cMainWindow;
@@ -60,6 +62,8 @@ private:
 	cPicturesThread*	m_lpPicturesThread;
 
 	QTime				m_timer;
+
+	QStandardItemModel*	m_lpSeriesListModel;
 
 	void				initDB();
 	void				loadDB();

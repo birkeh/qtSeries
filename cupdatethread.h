@@ -7,7 +7,7 @@
 #include <QThread>
 #include <QMutexLocker>
 #include <QList>
-#include <QTreeWidgetItem>
+#include <QStandardItem>
 #include <QSqlDatabase>
 
 
@@ -18,7 +18,7 @@ class cUpdateThread : public QThread
 public:
 	explicit				cUpdateThread();
 
-	void					setData(cMessageDialog *lpMessageDialog, const QList<QTreeWidgetItem*>& items, const QSqlDatabase& db);
+	void					setData(cMessageDialog *lpMessageDialog, const QModelIndexList& indexList, const QSqlDatabase& db);
 public slots:
 	void					stop();
 
@@ -29,7 +29,7 @@ signals:
 private:
 	QMutex					m_mutex;
 	bool					m_bStop;
-	QList<QTreeWidgetItem*>	m_items;
+	QModelIndexList			m_indexList;
 	QSqlDatabase			m_db;
 	QWidget*				m_lpParent;
 

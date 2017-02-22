@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QTreeWidget" name="m_lpSeriesList">
+     <widget class="QTreeView" name="m_lpSeriesList">
       <property name="contextMenuPolicy">
        <enum>Qt::CustomContextMenu</enum>
       </property>
@@ -32,11 +32,6 @@
       <property name="rootIsDecorated">
        <bool>false</bool>
       </property>
-      <column>
-       <property name="text">
-        <string notr="true">1</string>
-       </property>
-      </column>
      </widget>
     </item>
    </layout>
