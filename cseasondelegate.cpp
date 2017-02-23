@@ -7,10 +7,16 @@
 #include <QTreeWidget>
 #include <QDebug>
 
+#include <QFontMetrics>
+
+#include <QColor>
+#include <QRgb>
+
 
 #define FIELD_WIDTH		3
 #define FIELD_STEP		4
 #define FIELD_HEIGHT	15
+#define HEIGHT			18
 #define STATE_INIT		Qt::lightGray
 #define STATE_PROGRESS	Qt::blue
 #define STATE_DONE		Qt::green
@@ -27,7 +33,7 @@ void cSeasonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
 			lpSeason	= qvariant_cast<cSeason*>(index.data(Qt::UserRole));
 
 		if(option.state & QStyle::State_Selected)
-			painter->fillRect(option.rect, option.palette.highlight());
+			painter->fillRect(option.rect, QBrush(QColor(51, 153, 255)));
 
 		if(lpSeason)
 		{
@@ -39,6 +45,7 @@ void cSeasonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
 			painter->setBrush(option.palette.foreground());
 
 			painter->translate(option.rect.x(), option.rect.y());
+
 			for(int z = 0;z < episodeList.count();z++)
 			{
 				painter->setPen(Qt::NoPen);
@@ -99,11 +106,14 @@ QSize cSeasonDelegate::sizeHint(const QStyleOptionViewItem &option, const QModel
 				}
 			}
 			if(iTotal > 0 && lpSeason->number() != 0)
-				return(QSize((iTotal+1)*FIELD_STEP, FIELD_HEIGHT));
+				return(QSize((iTotal+1)*FIELD_STEP, HEIGHT));
+				//return(QSize((iTotal+1)*FIELD_STEP, FIELD_HEIGHT));
 			else
-				return(QSize(FIELD_STEP*40, FIELD_HEIGHT));
+				return(QSize(FIELD_STEP*40, HEIGHT));
+				//return(QSize(FIELD_STEP*40, FIELD_HEIGHT));
 		}
-		return(QSize(FIELD_STEP, FIELD_HEIGHT));
+		return(QSize(FIELD_STEP, HEIGHT));
+		//return(QSize(FIELD_STEP, FIELD_HEIGHT));
 	}
-	return QStyledItemDelegate::sizeHint(option, index);
+	return QSize(QStyledItemDelegate::sizeHint(option, index).width(), HEIGHT);
 }

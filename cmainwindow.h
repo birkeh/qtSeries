@@ -15,6 +15,7 @@
 #include <QTime>
 
 #include <QStandardItemModel>
+#include <QItemSelection>
 
 
 namespace Ui {
@@ -30,7 +31,14 @@ public:
 	~cMainWindow();
 
 private slots:
-	void				on_m_lpSeriesList_customContextMenuRequested(const QPoint &pos);
+	void				on_m_lpSeriesList1_customContextMenuRequested(const QPoint &pos);
+	void				on_m_lpSeriesList1_doubleClicked(const QModelIndex &index);
+	void				on_m_lpSeriesList1_pressed(const QModelIndex &index);
+
+	void				on_m_lpSeriesList2_customContextMenuRequested(const QPoint &pos);
+	void				on_m_lpSeriesList2_doubleClicked(const QModelIndex &index);
+	void				on_m_lpSeriesList2_pressed(const QModelIndex &index);
+
 	void				onActionAdd();
 	void				onActionUpdate();
 	void				onActionDelete();
@@ -39,7 +47,6 @@ private slots:
 	void				onActionGotoDownload();
 	void				onActionCopyDownload();
 	void				onActionLoadPictures();
-	void				on_m_lpSeriesList_doubleClicked(const QModelIndex &index);
 
 	void				updateMessage(const QString& szMessage, const qint32 &iProgress);
 	void				updateAppendMessage(const QString& szMessage);
@@ -48,7 +55,12 @@ private slots:
 	void				picturesMessage(const QString& szMessage, const qint32 &iProgress);
 	void				picturesAppendMessage(const QString& szMessage);
 	void				picturesDone();
-	void				on_m_lpSeriesList_pressed(const QModelIndex &index);
+
+	void				selectionChanged1(const QItemSelection &selected, const QItemSelection &deselected);
+	void				selectionChanged2(const QItemSelection &selected, const QItemSelection &deselected);
+
+	void				scrollbarValueChanged1(int value);
+	void				scrollbarValueChanged2(int value);
 
 private:
 	Ui::cMainWindow*	ui;
@@ -64,6 +76,8 @@ private:
 	QTime				m_timer;
 
 	QStandardItemModel*	m_lpSeriesListModel;
+
+	bool				m_bProcessing;
 
 	void				initDB();
 	void				loadDB();
