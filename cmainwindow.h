@@ -30,6 +30,7 @@ public:
 	explicit cMainWindow(QWidget *parent = 0);
 	~cMainWindow();
 
+	void				initDone();
 private slots:
 	void				on_m_lpSeriesList1_customContextMenuRequested(const QPoint &pos);
 	void				on_m_lpSeriesList1_doubleClicked(const QModelIndex &index);
@@ -85,7 +86,7 @@ private:
 
 	bool				runEdit(cSerie *lpSerie, QString& szDownload);
 protected:
-	void				closeEvent(QCloseEvent * event);
+	void				closeEvent(QCloseEvent *event);
 };
 
 #endif // CMAINWINDOW_H

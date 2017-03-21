@@ -51,6 +51,7 @@ void cUpdateThread::run()
 							lpEpisodeNew->setState(lpEpisode->state());
 					}
 				}
+                lpSerieNew->setCliffhanger(lpSerie->cliffhanger());
 				lpSerie->del(m_db);
 				lpSerieNew->save(m_db);
 			}

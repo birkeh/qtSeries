@@ -35,6 +35,8 @@ private slots:
 
 	void on_m_lpCliffhanger_clicked();
 
+    void on_m_lpFirstAired_dateChanged(const QDate &date);
+
 private:
 	Ui::cEdit*			ui;
 	bool				m_bLoaded;

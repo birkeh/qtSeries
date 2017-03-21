@@ -29,6 +29,7 @@
 #include <QElapsedTimer>
 
 #include <QScrollBar>
+#include <QDesktopWidget>
 
 
 cMainWindow::cMainWindow(QWidget *parent) :
@@ -57,6 +58,8 @@ cMainWindow::cMainWindow(QWidget *parent) :
 	ui->m_lpSeriesList2->setModel(m_lpSeriesListModel);
 	ui->m_lpSeriesList2->setItemDelegate(new cSeasonDelegate(ui->m_lpSeriesList2));
 
+	ui->m_lpSeriesList1->header()->setSectionResizeMode(2, QHeaderView::Stretch);
+
 	loadDB();
 	displaySeries();
 
@@ -70,6 +73,23 @@ cMainWindow::cMainWindow(QWidget *parent) :
 		resize(iWidth, iHeight);
 	if(iX != -1 && iY != -1)
 		move(iX, iY);
+
+	qint16	iWindowWidth	= iWidth;
+	qint16	iSubtract		= 20;
+
+	if(settings.value("main/maximized").toBool())
+		iWindowWidth	= QApplication::desktop()->geometry().width();
+
+	qint16	iWidth1			= 0;
+	qint16	iWidth2;
+
+	for(int z = 0;z < 3;z++)
+		iWidth1	+= ui->m_lpSeriesList1->columnWidth(z);
+
+	iWidth1	+= 2;
+	iWidth2	= iWindowWidth-iSubtract-iWidth1;
+
+	ui->m_lpSplitter->setSizes(QList<int>() << iWidth1 << iWidth2);
 
 	delete lpDialog;
 
@@ -173,7 +193,7 @@ void cMainWindow::loadDB()
 	cSeason*	lpSeason;
 	cEpisode*	lpEpisode;
 
-	if(query.exec("SELECT serie.seriesID, serie.seriesName, serie.language, serie.banner, serie.overview, serie.firstAired, serie.network, serie.imdbid, serie.id, serie.contentRating, serie.rating, serie.ratingCount, serie.runtime, serie.status, serie.download, serie.cliffhanger, serie.actor, serie.genre, episode.episodeID, episode.episodeName, episode.episodeNumber, episode.firstAired, episode.imdbid, episode.language, episode.overview, episode.productioncode, episode.rating, episode.ratingCount, episode.seasonNumber, episode.seasonID, episode.seriesID, episode.state, episode.filename, episode.thumb_height, episode.thumb_width, episode.director, episode.gueststars, episode.episode_writer FROM serie, episode WHERE serie.id = episode.seriesID ORDER BY serie.seriesName, episode.seasonNumber, episode.episodeNumber;"))
+    if(query.exec("SELECT serie.seriesID, serie.seriesName, serie.language, serie.banner, serie.overview, serie.firstAired, serie.network, serie.imdbid, serie.id, serie.contentRating, serie.rating, serie.ratingCount, serie.runtime, serie.status, serie.download, serie.cliffhanger, serie.actor, serie.genre, episode.episodeID, episode.episodeName, episode.episodeNumber, episode.firstAired, episode.imdbid, episode.language, episode.overview, episode.productioncode, episode.rating, episode.ratingCount, episode.seasonNumber, episode.seasonID, episode.seriesID, episode.state, episode.filename, episode.thumb_height, episode.thumb_width, episode.director, episode.gueststars, episode.episode_writer FROM serie LEFT JOIN episode ON serie.id = episode.seriesID ORDER BY serie.seriesName, episode.seasonNumber, episode.episodeNumber;"))
 	{
 		while(query.next())
 		{
@@ -422,11 +442,14 @@ void cMainWindow::displaySeries()
 		lpItems.at(2)->setToolTip(szOpen);
 	}
 
+	for(int z = 3;z < m_lpSeriesListModel->columnCount();z++)
+	{
+		ui->m_lpSeriesList1->setColumnWidth(z, 0);
+		ui->m_lpSeriesList2->resizeColumnToContents(z);
+	}
+
 	for(int z = 2;z >= 0;z--)
 		ui->m_lpSeriesList1->resizeColumnToContents(z);
-
-	for(int z = 3;z < m_lpSeriesListModel->columnCount();z++)
-		ui->m_lpSeriesList2->resizeColumnToContents(z);
 
 	if(selected.isValid())
 	{
@@ -890,7 +913,7 @@ void cMainWindow::picturesDone()
 	m_lpMessageDialog	= 0;
 }
 
-void cMainWindow::on_m_lpSeriesList1_pressed(const QModelIndex &index)
+void cMainWindow::on_m_lpSeriesList1_pressed(const QModelIndex &/*index*/)
 {
 	switch(QGuiApplication::mouseButtons())
 	{
@@ -910,7 +933,7 @@ void cMainWindow::on_m_lpSeriesList1_pressed(const QModelIndex &index)
 	}
 }
 
-void cMainWindow::on_m_lpSeriesList2_pressed(const QModelIndex &index)
+void cMainWindow::on_m_lpSeriesList2_pressed(const QModelIndex &/*index*/)
 {
 	switch(QGuiApplication::mouseButtons())
 	{

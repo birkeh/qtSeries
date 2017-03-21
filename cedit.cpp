@@ -89,6 +89,7 @@ void cEdit::setSerie(cSerie* lpSerie)
 		return;
 
 	ui->m_lpName->setText(lpSerie->seriesName());
+    ui->m_lpFirstAired->setDate(lpSerie->firstAired());
 	ui->m_lpCliffhanger->setChecked(lpSerie->cliffhanger());
 	ui->m_lpDownloadLink->setText(lpSerie->download());
 
@@ -278,4 +279,9 @@ void cEdit::on_m_lpTabWidget_tabBarClicked(int index)
 void cEdit::on_m_lpCliffhanger_clicked()
 {
 	m_lpSerie->setCliffhanger(ui->m_lpCliffhanger->checkState() == Qt::Checked);
+}
+
+void cEdit::on_m_lpFirstAired_dateChanged(const QDate &date)
+{
+    m_lpSerie->setFirstAired(date);
 }

@@ -40,6 +40,16 @@
                 </widget>
                </item>
                <item>
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Year:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDateEdit" name="m_lpFirstAired"/>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="m_lpCliffhanger">
                  <property name="text">
                   <string>Cliffhanger</string>
@@ -147,8 +157,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>209</width>
-                <height>174</height>
+                <width>756</width>
+                <height>241</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_4">
