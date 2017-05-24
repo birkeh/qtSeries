@@ -4,6 +4,7 @@
 #include "cepisode.h"
 #include "cthetvdb.h"
 #include "cmessagedialog.h"
+#include <QMessageBox>
 
 #include <QDebug>
 #include <QTime>
@@ -25,6 +26,7 @@ void cUpdateThread::run()
 {
 	QTime	timer;
 	timer.restart();
+	QString szFailed;
 
 	for(int x = 0;x < m_indexList.count();x++)
 	{
@@ -38,7 +40,15 @@ void cUpdateThread::run()
 			if(lpSerie->seriesID() != -1)
 			{
 				lpSerieNew	= tvDB.load(lpSerie->id(), "de");
-
+				if(!lpSerieNew)
+					lpSerieNew = tvDB.load(lpSerie->id(), "en");
+				if(!lpSerieNew)
+				{
+					if(szFailed.length())
+						szFailed += ", ";
+					szFailed += lpSerie->seriesName();
+					continue;
+				}
 				lpSerieNew->setDownload(lpSerie->download());
 				for(int x = 0;x < lpSerieNew->seasonList().count();x++)
 				{
@@ -62,6 +72,14 @@ void cUpdateThread::run()
 			break;
 		msleep(10);
 	}
+/*
+	if(szFailed.length())
+	{
+		QMessageBox	msgBox;
+		msgBox.setText(szFailed + QString(" has failed to update."));
+		msgBox.exec();
+	}
+*/
 }
 
 void cUpdateThread::setData(cMessageDialog* lpMessageDialog, const QModelIndexList &indexList, const QSqlDatabase& db)
