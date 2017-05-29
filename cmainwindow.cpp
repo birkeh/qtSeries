@@ -1,7 +1,6 @@
 #include "cmainwindow.h"
 #include "ui_cmainwindow.h"
 
-#include "cthetvdb.h"
 #include "cthetvdbv2.h"
 #include "cseasondelegate.h"
 #include "csearch.h"
@@ -653,9 +652,11 @@ void cMainWindow::onActionAdd()
 		if(id == -1)
 			return;
 
-		cTheTVDB		tvDB;
+		cTheTVDBV2		tvDB2;
 
-		lpSerie	= tvDB.load(id, "de");
+		lpSerie	= tvDB2.load(id, "de");
+		if(!lpSerie)
+			lpSerie	= tvDB2.load(id, "en");
 
 		delete lpDialog;
 
@@ -668,11 +669,7 @@ void cMainWindow::onActionAdd()
 		lpDialog->setMessage("Updating");
 		lpDialog->show();
 
-//		lpSerie->setDownload(szDownload);
-//		lpSerie->updateState();
-
 		lpSerie->save(m_db);
-
 	}
 	else
 	{

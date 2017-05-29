@@ -14,7 +14,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         cmainwindow.cpp \
-    cthetvdb.cpp \
     cserie.cpp \
     cseasondelegate.cpp \
     cseason.cpp \
@@ -32,7 +31,6 @@ SOURCES += main.cpp\
     cthetvdbv2.cpp
 
 HEADERS  += cmainwindow.h \
-    cthetvdb.h \
     cserie.h \
     cseasondelegate.h \
     cseason.h \

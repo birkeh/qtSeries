@@ -41,24 +41,23 @@ void cSearch::on_m_lpSearchButton_clicked()
 
 	cTheTVDB			theTVDB;
 	cTheTVDBV2			theTVDBV2;
-	QList<cSerie*>		serieList	= theTVDB.search(ui->m_lpSearch->text());
 	QList<cSerie*>		serieList2	= theTVDBV2.search(ui->m_lpSearch->text());
 
 	ui->m_lpResults->clear();
 
-	for(int z = 0;z < serieList.count();z++)
+	for(int z = 0;z < serieList2.count();z++)
 	{
-		cSerie*	lpSerie	= serieList.at(z);
+		cSerie*	lpSerie	= serieList2.at(z);
 		QTreeWidgetItem*	lpNew		= new QTreeWidgetItem(ui->m_lpResults);
 		lpNew->setText(0, lpSerie->seriesName());
-		lpNew->setText(1, lpSerie->language());
 		lpNew->setText(2, QString("%1").arg(lpSerie->firstAired().year()));
 		lpNew->setData(0, Qt::UserRole, QVariant::fromValue(lpSerie->id()));
 		ui->m_lpResults->addTopLevelItem(lpNew);
 	}
 	ui->m_lpResults->resizeColumnToContents(0);
 	ui->m_lpResults->resizeColumnToContents(1);
-	ui->m_lpResults->resizeColumnToContents(2);
+
+	ui->m_lpResults->sortItems(0, Qt::AscendingOrder);
 
 	delete lpDialog;
 }
