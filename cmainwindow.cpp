@@ -2,6 +2,7 @@
 #include "ui_cmainwindow.h"
 
 #include "cthetvdb.h"
+#include "cthetvdbv2.h"
 #include "cseasondelegate.h"
 #include "csearch.h"
 #include "cmessageanimatedialog.h"

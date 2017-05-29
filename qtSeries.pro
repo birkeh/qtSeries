@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     cepisodedetails.cpp \
     cmessagedialog.cpp \
     cupdatethread.cpp \
-    cpicturesthread.cpp
+    cpicturesthread.cpp \
+    cthetvdbv2.cpp
 
 HEADERS  += cmainwindow.h \
     cthetvdb.h \
@@ -45,7 +46,8 @@ HEADERS  += cmainwindow.h \
     cepisodedetails.h \
     cmessagedialog.h \
     cupdatethread.h \
-    cpicturesthread.h
+    cpicturesthread.h \
+    cthetvdbv2.h
 
 FORMS    += cmainwindow.ui \
     csearch.ui \
