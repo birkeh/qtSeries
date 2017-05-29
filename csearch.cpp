@@ -1,7 +1,6 @@
 #include "csearch.h"
 #include "ui_csearch.h"
 
-#include "cthetvdb.h"
 #include "cthetvdbv2.h"
 
 #include "cserie.h"
@@ -39,7 +38,6 @@ void cSearch::on_m_lpSearchButton_clicked()
 	lpDialog->setMessage("Searching");
 	lpDialog->show();
 
-	cTheTVDB			theTVDB;
 	cTheTVDBV2			theTVDBV2;
 	QList<cSerie*>		serieList2	= theTVDBV2.search(ui->m_lpSearch->text());
 

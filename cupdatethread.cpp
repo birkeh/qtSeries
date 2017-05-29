@@ -2,7 +2,7 @@
 #include "cserie.h"
 #include "cseason.h"
 #include "cepisode.h"
-#include "cthetvdb.h"
+#include "cthetvdbv2.h"
 #include "cmessagedialog.h"
 #include <QMessageBox>
 
@@ -34,7 +34,7 @@ void cUpdateThread::run()
 		if(lpSerie)
 		{
 			emit updateMessage(lpSerie->seriesName(), x);
-			cTheTVDB		tvDB;
+			cTheTVDBV2		tvDB;
 			cSerie*			lpSerieNew;
 
 			if(lpSerie->seriesID() != -1)
