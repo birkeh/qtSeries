@@ -28,7 +28,9 @@ SOURCES += main.cpp\
     cmessagedialog.cpp \
     cupdatethread.cpp \
     cpicturesthread.cpp \
-    cthetvdbv2.cpp
+    cthetvdbv2.cpp \
+    cthemoviedbv3.cpp \
+    cmovie.cpp
 
 HEADERS  += cmainwindow.h \
     cserie.h \
@@ -45,7 +47,9 @@ HEADERS  += cmainwindow.h \
     cmessagedialog.h \
     cupdatethread.h \
     cpicturesthread.h \
-    cthetvdbv2.h
+    cthetvdbv2.h \
+    cthemoviedbv3.h \
+    cmovie.h
 
 FORMS    += cmainwindow.ui \
     csearch.ui \

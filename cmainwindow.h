@@ -3,6 +3,8 @@
 
 
 #include "cserie.h"
+#include "cmovie.h"
+
 #include "cupdatethread.h"
 #include "cpicturesthread.h"
 
@@ -66,6 +68,7 @@ private slots:
 private:
 	Ui::cMainWindow*	ui;
 	cSerieList			m_serieList;
+	cMovieList			m_movieList;
 	QSqlDatabase		m_db;
 
 	QString				m_szOldSelected;
@@ -82,6 +85,9 @@ private:
 
 	void				initDB();
 	void				loadDB();
+	void				loadSeriesDB();
+	void				loadMoviesDB();
+
 	void				displaySeries();
 
 	bool				runEdit(cSerie *lpSerie, QString& szDownload);
